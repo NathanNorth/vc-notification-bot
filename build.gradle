@@ -21,7 +21,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
     //discord4j
-    implementation 'com.discord4j:discord4j-core:3.2.0-M2'
+    implementation 'com.discord4j:discord4j-core:3.2.0-M3'
 
     //databases
     implementation 'org.jdbi:jdbi3-core:3.16.0'
