@@ -1,4 +1,4 @@
-package io.github.nathannorth.vcNotificationBot;
+package io.github.nathannorth.vcBot;
 
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;

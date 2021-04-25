@@ -1,4 +1,4 @@
-package io.github.nathannorth.vcNotificationBot;
+package io.github.nathannorth.vcBot;
 
 import java.io.IOException;
 import java.nio.file.Files;
