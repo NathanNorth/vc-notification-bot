@@ -6,7 +6,7 @@ plugins {
 }
 
 application { //whatever class main is in
-    mainClassName = 'io.github.nathannorth.vc-notification-bot.Main'
+    mainClassName = 'io.github.nathannorth.vcNotificationBot.Main'
 }
 
 group 'io.github.nathannorth'
@@ -36,7 +36,7 @@ test {
 
 jar { //creates myself a jar file
     manifest {
-        attributes "Main-Class": "io.github.nathannorth.vc-notification-bot.Main"
+        attributes "Main-Class": "io.github.nathannorth.vcNotificationBot.Main"
     }
 
     from {

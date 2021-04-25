@@ -2,14 +2,6 @@
 /.gradle/
 /build/
 /build/classes/java/main/
-/gradlew
-/gradlew.bat
-/.idea/compiler.xml
-/.idea/gradle.xml
-/gradle/wrapper/gradle-wrapper.jar
-/gradle/wrapper/gradle-wrapper.properties
-/.idea/jarRepositories.xml
-/.idea/libraries-with-intellij-classes.xml
-/.idea/misc.xml
-/.idea/modules/vc-notification-bot.iml
-/.idea/.gitignore
+
+#key file
+/keys.txt
