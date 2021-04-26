@@ -17,16 +17,19 @@ public class Database {
                     .build());
 
     public static void init() {
-        Mono.from(factory.create())
+
+        Mono<Boolean> createTable = Mono.from(factory.create())
                 .flatMapMany(connection -> connection
                         .createStatement(
                                 "CREATE TABLE IF NOT EXISTS guilds" +
-                                "(" +
-                                "guildID INTEGER" +
-                                ", userID INTEGER" +
-                                ", PRIMARY KEY(guildID, userID)" +
-                                ")"
-                        ).execute()).blockFirst();
+                                        "(" +
+                                        "guildID INTEGER" +
+                                        ", userID INTEGER" +
+                                        ", PRIMARY KEY(guildID, userID)" +
+                                        ")")
+                        .execute())
+                .then(Mono.just(true))
+                .onErrorResume(error -> Mono.just(false));
     }
 
     public static List<Snowflake> getChans() {
