@@ -8,7 +8,7 @@ import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
 import reactor.core.publisher.Mono;
 
-public class Listen extends Command {
+public class Watch extends Command {
 
     @Override
     protected ApplicationCommandRequest getRequest() {

@@ -3,13 +3,11 @@ package io.github.nathannorth.vcBot;
 import discord4j.common.util.Snowflake;
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionFactory;
-import io.r2dbc.postgresql.api.PostgresqlConnection;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 public class Database {
-    private static final String url = "r2dbc:postgresql://localhost:5432/testDB";
     private static final PostgresqlConnectionFactory factory =
             new PostgresqlConnectionFactory(PostgresqlConnectionConfiguration.builder()
                     .host("localhost")

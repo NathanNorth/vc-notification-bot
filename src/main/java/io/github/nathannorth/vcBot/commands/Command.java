@@ -5,7 +5,7 @@ import discord4j.discordjson.json.ApplicationCommandRequest;
 import reactor.core.publisher.Mono;
 
 public abstract class Command {
-    public final String name;
+    public final String name; //convenience var, based on commandRequest
     public final ApplicationCommandRequest commandRequest;
 
     public Command() {
