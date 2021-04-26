@@ -5,3 +5,6 @@
 
 #key file
 /keys.txt
+
+#database data
+/postgres/data/

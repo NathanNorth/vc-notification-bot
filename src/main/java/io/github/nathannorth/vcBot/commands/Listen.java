@@ -13,11 +13,11 @@ public class Listen extends Command {
     @Override
     protected ApplicationCommandRequest getRequest() {
         return ApplicationCommandRequest.builder()
-                .name("listen")
-                .description("Add a vc to your listening list")
+                .name("watch")
+                .description("Add a voice channel to your watchlist")
                 .addOption(ApplicationCommandOptionData.builder()
                         .name("channel")
-                        .description("Channel you want to listen to")
+                        .description("Channel for the bot to watch")
                         .type(ApplicationCommandOptionType.CHANNEL.getValue()).required(true)
                         .build())
                 .build();
@@ -31,7 +31,7 @@ public class Listen extends Command {
                 .get(); //shouldn't be possible to make this throw errors
 
         return chan.ofType(VoiceChannel.class).flatMap(channel -> {
-            return event.getInteractionResponse().createFollowupMessage("Done!");
+            return event.getInteractionResponse().createFollowupMessage("The " + channel.getName() + " is now being watched.");
         }).switchIfEmpty(event.getInteractionResponse().createFollowupMessage("Channel must be an audio channel!"));
     }
 }

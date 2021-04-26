@@ -16,15 +16,18 @@ public class Commands {
     public static final Map<String, Command> responses = new HashMap<>();
 
     public static void init() {
+        //load all commands into the list
         System.out.print("Loading commands...");
         commands.add(new Listen());
         System.out.println(commands.size() + " commands loaded!");
 
+        //populate lists of commandRequests and map of commands
         for(Command c: commands) {
             slashes.add(c.commandRequest);
             responses.put(c.name, c);
         }
 
+        //override any existing commands
         System.out.print("Bulk overriding slashes...");
         Bot.getRestClient().getApplicationService().bulkOverwriteGlobalApplicationCommand(Bot.getAppID(), slashes).subscribe();
         System.out.println("done!");
