@@ -1,7 +1,6 @@
 package io.github.nathannorth.vcBot.commands;
 
 import discord4j.core.event.domain.InteractionCreateEvent;
-import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;

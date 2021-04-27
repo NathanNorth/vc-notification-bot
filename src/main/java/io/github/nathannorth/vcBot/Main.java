@@ -7,6 +7,7 @@ import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.VoiceChannel;
+import discord4j.rest.http.client.ClientException;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,7 +22,7 @@ public class Main {
         //define fluxes
         Flux<Event> slashInteraction = Bot.getClient().on(slashAdapter);
         Flux<Message> channelListener = Bot.getClient().on(VoiceStateUpdateEvent.class)
-                .filter(event -> event.isJoinEvent() || event.isMoveEvent()) //ignore leave events todo do i ignore move events too?
+                .filter(event -> event.isJoinEvent() || event.isMoveEvent()) //ignore leave events
                 .map(event -> event.getCurrent())
                 .filterWhen(current -> Database.getChans().any(snowflake -> snowflake.equals(current.getChannelId().get())))
                 .flatMap(current -> Database.relevantUsersFor(current.getChannelId().get())
@@ -50,9 +51,10 @@ public class Main {
         return stringMono.flatMap(string ->
                 Bot.getClient().getUserById(toWho)
                         .flatMap(user -> user.getPrivateChannel()
-                                .flatMap(priv -> priv.createMessage(string))
-                        )
-        );
-
+                                .flatMap(priv -> priv.createMessage(string))))
+                .onErrorResume(e -> {
+                    if(e instanceof ClientException) return Mono.empty(); //throw away permission errors
+                    else return Mono.error(e); //still crash the program if something else goes wrong
+                });
     }
 }

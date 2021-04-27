@@ -63,7 +63,6 @@ public class Database {
                         .then(Mono.just(true))
         ).switchIfEmpty(Mono.just(false));
     }
-
     //completes with at true value if exists, else completes empty
     private static Mono<Boolean> exists(Snowflake channel, Snowflake user) {
         return client.sql("SELECT * FROM chans WHERE channelID = :chan AND userID = :user")
