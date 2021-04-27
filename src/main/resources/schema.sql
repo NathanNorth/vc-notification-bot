@@ -1,1 +1,0 @@
-CREATE TABLE chans (channelID INTEGER, userID INTEGER, PRIMARY KEY (channelID, userID));

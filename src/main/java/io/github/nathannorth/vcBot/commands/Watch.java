@@ -6,6 +6,8 @@ import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.rest.util.ApplicationCommandOptionType;
+import io.github.nathannorth.vcBot.Database;
+import io.github.nathannorth.vcBot.Util;
 import reactor.core.publisher.Mono;
 
 public class Watch extends Command {
@@ -30,8 +32,11 @@ public class Watch extends Command {
                 .map(e -> e.asChannel())
                 .get(); //shouldn't be possible to make this throw errors
 
-        return chan.ofType(VoiceChannel.class).flatMap(channel -> {
-            return event.getInteractionResponse().createFollowupMessage("The " + channel.getName() + " is now being watched.");
-        }).switchIfEmpty(event.getInteractionResponse().createFollowupMessage("Channel must be an audio channel!"));
+        return chan.ofType(VoiceChannel.class).flatMap(channel ->
+                Database.addUserForChan(channel.getId(), event.getInteraction().getUser().getId())
+                        .flatMap(bool -> bool
+                                ? Util.followUp(event, "The **" + channel.getName() + "** channel is now being watched.")
+                                : Util.followUp(event, "The **" + channel.getName() + "** channel was already being watched.")))
+                .switchIfEmpty(Util.followUp(event, "The channel must be a voice channel."));
     }
 }

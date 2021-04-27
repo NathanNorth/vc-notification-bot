@@ -4,8 +4,6 @@ import discord4j.core.event.ReactiveEventAdapter;
 import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
-import discord4j.core.event.domain.channel.VoiceChannelUpdateEvent;
-import discord4j.core.event.domain.guild.MemberJoinEvent;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 

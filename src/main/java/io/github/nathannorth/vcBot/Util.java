@@ -1,5 +1,9 @@
 package io.github.nathannorth.vcBot;
 
+import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.discordjson.json.MessageData;
+import reactor.core.publisher.Mono;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,5 +24,9 @@ public class Util {
             }
         }
         return keys;
+    }
+
+    public static Mono<MessageData> followUp(InteractionCreateEvent event, String messsage) {
+        return event.getInteractionResponse().createFollowupMessage(messsage);
     }
 }
