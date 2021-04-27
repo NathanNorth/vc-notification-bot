@@ -1,6 +1,7 @@
 package io.github.nathannorth.vcBot;
 
 import discord4j.core.event.domain.InteractionCreateEvent;
+import discord4j.core.object.entity.channel.Channel;
 import discord4j.discordjson.json.MessageData;
 import reactor.core.publisher.Mono;
 
@@ -10,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Util {
+    //keys.txt is stored in root dir and holds instance-specific data (eg. bot token)
     private static List<String> keys = null;
     public static List<String> getKeys() {
         if (keys == null) {
@@ -26,7 +28,16 @@ public class Util {
         return keys;
     }
 
+    //shortcut method for a follow up to a InteractionCreateEvent
     public static Mono<MessageData> followUp(InteractionCreateEvent event, String messsage) {
         return event.getInteractionResponse().createFollowupMessage(messsage);
+    }
+
+    //shortcut method to get a channel from a slash command that requires a channel arg
+    public static Mono<Channel> getChanArg(InteractionCreateEvent event) {
+        return event.getInteraction().getCommandInteraction().getOption("channel")
+                .flatMap(e -> e.getValue())
+                .map(e -> e.asChannel())
+                .get();
     }
 }

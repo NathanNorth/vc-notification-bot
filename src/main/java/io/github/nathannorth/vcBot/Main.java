@@ -1,11 +1,15 @@
 package io.github.nathannorth.vcBot;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.event.ReactiveEventAdapter;
 import discord4j.core.event.domain.Event;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.channel.VoiceChannel;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,8 +19,14 @@ public class Main {
         Database.init();
 
         //define fluxes
-        Flux<Event> slashInteraction = Bot.getClient().on(eventAdapter);
-        Flux<?> channelListener = Bot.getClient().on(VoiceStateUpdateEvent.class).log(); //todo do something with this
+        Flux<Event> slashInteraction = Bot.getClient().on(slashAdapter);
+        Flux<Message> channelListener = Bot.getClient().on(VoiceStateUpdateEvent.class)
+                .filter(event -> event.isJoinEvent() || event.isMoveEvent()) //ignore leave events todo do i ignore move events too?
+                .map(event -> event.getCurrent())
+                .filterWhen(current -> Database.getChans().any(snowflake -> snowflake.equals(current.getChannelId().get())))
+                .flatMap(current -> Database.relevantUsersFor(current.getChannelId().get())
+                        .flatMap(userSnowflake -> alert(userSnowflake, current.getUserId(), current.getChannelId().get()))
+                );
 
         //subscribe to fluxes
         Flux.merge(slashInteraction, channelListener)
@@ -25,10 +35,24 @@ public class Main {
         //block to keep program running
         Bot.getClient().onDisconnect().block();
     }
-    private static final ReactiveEventAdapter eventAdapter = new ReactiveEventAdapter() {
+    private static final ReactiveEventAdapter slashAdapter = new ReactiveEventAdapter() {
         @Override
         public Publisher<?> onInteractionCreate(InteractionCreateEvent event) {
             return event.acknowledgeEphemeral().then(Commands.getCommand(event.getCommandName()).execute(event));
         }
     };
+    private static Mono<Message> alert(Snowflake toWho, Snowflake aboutWhom, Snowflake joiningWhere) {
+        Mono<String> stringMono = Bot.getClient().getChannelById(joiningWhere).ofType(VoiceChannel.class)
+                .flatMap(voiceChannel -> voiceChannel.getGuild().map(guild -> voiceChannel.getName() + "]** channel in the **[" + guild.getName() + "]** server."))
+                .flatMap(channelInfo -> Bot.getClient().getUserById(aboutWhom)
+                        .map(user -> "**[" + user.getUsername() + "#" + user.getDiscriminator() + "]** joined the **[" + channelInfo));
+
+        return stringMono.flatMap(string ->
+                Bot.getClient().getUserById(toWho)
+                        .flatMap(user -> user.getPrivateChannel()
+                                .flatMap(priv -> priv.createMessage(string))
+                        )
+        );
+
+    }
 }

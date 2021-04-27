@@ -2,6 +2,7 @@ package io.github.nathannorth.vcBot;
 
 import discord4j.discordjson.json.ApplicationCommandRequest;
 import io.github.nathannorth.vcBot.commands.Command;
+import io.github.nathannorth.vcBot.commands.UnWatch;
 import io.github.nathannorth.vcBot.commands.Watch;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class Commands {
         //load all commands into the list
         System.out.print("Loading commands...");
         commands.add(new Watch());
+        commands.add(new UnWatch());
         System.out.println(commands.size() + " commands loaded!");
 
         //populate lists of commandRequests and map of commands

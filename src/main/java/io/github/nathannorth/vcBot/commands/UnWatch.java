@@ -10,28 +10,27 @@ import io.github.nathannorth.vcBot.Database;
 import io.github.nathannorth.vcBot.Util;
 import reactor.core.publisher.Mono;
 
-public class Watch extends Command {
-
+public class UnWatch extends Command {
     @Override
     protected ApplicationCommandRequest getRequest() {
-        return ApplicationCommandRequest.builder()
-                .name("watch")
-                .description("Add a voice channel to your watchlist")
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name("channel")
-                        .description("Channel for the bot to watch")
-                        .type(ApplicationCommandOptionType.CHANNEL.getValue()).required(true)
-                        .build())
-                .build();
+         return ApplicationCommandRequest.builder()
+                 .name("unwatch")
+                 .description("Remove a voice channel from your watchlist")
+                 .addOption(ApplicationCommandOptionData.builder()
+                         .name("channel")
+                         .description("Channel for the bot stop watching")
+                         .type(ApplicationCommandOptionType.CHANNEL.getValue()).required(true)
+                         .build())
+                 .build();
     }
 
     @Override
     public Mono<?> execute(InteractionCreateEvent event) {
         return Util.getChanArg(event).ofType(VoiceChannel.class).flatMap(channel ->
-                Database.addUserForChan(channel.getId(), event.getInteraction().getUser().getId())
+                Database.removeUserForChan(channel.getId(), event.getInteraction().getUser().getId())
                         .flatMap(bool -> bool
-                                ? Util.followUp(event, "The **" + channel.getName() + "** channel is now being watched.")
-                                : Util.followUp(event, "The **" + channel.getName() + "** channel was already being watched.")))
+                                ? Util.followUp(event, "The **" + channel.getName() + "** channel is no longer being watched.")
+                                : Util.followUp(event, "The **" + channel.getName() + "** channel was not being watched.")))
                 .switchIfEmpty(Util.followUp(event, "The channel must be a voice channel."));
     }
 }
