@@ -1,4 +1,4 @@
 # vc-notification-bot
-This bot serves the singular purpose of alerting users when people join a vc channel that they have told the bot to 'listen' to.
+Also known as the FOMO Bot and the Stalking Bot, the vc-notification-bot is a dead simple tool to help you keep track of when people join voice channel in Discord. Simply use "/watch (channelName)" to add a channel to your watchlist, and "/unwatch (channelName)" to do the opposite.
 
-(WIP)
+vc-notification-bot is built reactively using Discord4J and a r2dbc-managed PostgreSQL database backend.

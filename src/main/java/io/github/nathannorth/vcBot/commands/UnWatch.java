@@ -1,7 +1,6 @@
 package io.github.nathannorth.vcBot.commands;
 
 import discord4j.core.event.domain.InteractionCreateEvent;
-import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.discordjson.json.ApplicationCommandOptionData;
 import discord4j.discordjson.json.ApplicationCommandRequest;
@@ -11,6 +10,7 @@ import io.github.nathannorth.vcBot.Util;
 import reactor.core.publisher.Mono;
 
 public class UnWatch extends Command {
+
     @Override
     protected ApplicationCommandRequest getRequest() {
          return ApplicationCommandRequest.builder()

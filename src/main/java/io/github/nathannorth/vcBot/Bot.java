@@ -3,6 +3,8 @@ package io.github.nathannorth.vcBot;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.User;
+import discord4j.core.object.presence.ClientActivity;
+import discord4j.core.object.presence.ClientPresence;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.RestClient;
@@ -25,6 +27,15 @@ public class Bot {
         restClient = client.getRestClient();
         appID = restClient.getApplicationId().block();
         self = client.getSelf().block();
+
+        //if keys specify a status, use it
+        if(Util.getKeys().size() > 1) {
+            client.updatePresence(ClientPresence.online(ClientActivity.playing(Util.getKeys().get(1)))).block();
+            System.out.println("Status set from keys.");
+        }
+        else {
+            System.out.println("No status specified, no status set.");
+        }
     }
 
     public static GatewayDiscordClient getClient() {
