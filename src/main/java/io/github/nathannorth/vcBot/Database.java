@@ -10,17 +10,7 @@ import reactor.core.publisher.Mono;
 
 public class Database {
 
-    private static DatabaseClient client =
-            DatabaseClient.create(new PostgresqlConnectionFactory(
-                    PostgresqlConnectionConfiguration.builder()
-                            .database(Util.getKeys().get(2))
-                            .username(Util.getKeys().get(2))
-                            .password(Util.getKeys().get(3))
-                            .host(Util.getKeys().get(4))
-                            .port(Integer.parseInt(Util.getKeys().get(5)))
-                            .build()
-            )
-    );
+    private static DatabaseClient client;
 
     public static void init() {
         getCon(0);
@@ -28,6 +18,17 @@ public class Database {
     //catch blocks from hell to try a simple db action on a 2 ^ (attempt) second retry loop
     private static void getCon(int retry) {
         try {
+             client = DatabaseClient.create(new PostgresqlConnectionFactory(
+                            PostgresqlConnectionConfiguration.builder()
+                                    .database(Util.getKeys().get(2))
+                                    .username(Util.getKeys().get(2))
+                                    .password(Util.getKeys().get(3))
+                                    .host(Util.getKeys().get(4))
+                                    .port(Integer.parseInt(Util.getKeys().get(5)))
+                                    .build()
+                    )
+             );
+
             client.sql("CREATE TABLE IF NOT EXISTS " +
                     "chans (channelID BIGINT, userID BIGINT, PRIMARY KEY (channelID, userID))")
                     .then()
