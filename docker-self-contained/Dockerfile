@@ -9,7 +9,7 @@ RUN git clone https://github.com/NathanNorth/vc-notification-bot /code
 
 WORKDIR /code
 RUN chmod +x gradlew
-RUN /code/gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-1.8-openjdk build && mv build/libs/vc-notification-bot-*-all.jar /code/bot.jar
+RUN /code/gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-1.8-openjdk build && mv build/libs/vc-notification-bot-*.jar /code/bot.jar
 
 FROM openjdk:8-jdk-slim
 COPY --from=build-env /code/bot.jar /bot/bot.jar

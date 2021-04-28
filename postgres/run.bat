@@ -1,1 +1,1 @@
-docker run --name database1 --mount type=bind,source="%cd%"/data,target=/var/lib/postgresql/data -e POSTGRES_PASSWORD=password -p 5432:5432 postdb
+docker run --name database1 --mount type=bind,source="%cd%"/data,target=/var/lib/postgresql/data -e POSTGRES_USER=vcbot -e POSTGRES_PASSWORD=password -p 5432:5432 postdb
