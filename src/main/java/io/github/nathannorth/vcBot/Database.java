@@ -13,18 +13,9 @@ public class Database {
     private static DatabaseClient client;
 
     public static void init() {
-        try {
-            getCon(0);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        client.sql("CREATE TABLE IF NOT EXISTS " +
-                "chans (channelID BIGINT, userID BIGINT, PRIMARY KEY (channelID, userID))")
-                .then()
-                .block();
+        getCon(0);
     }
-
-    private static void getCon(int retry) throws InterruptedException {
+    private static void getCon(int retry) {
         try {
             client = DatabaseClient.create(
                     new PostgresqlConnectionFactory(
@@ -37,9 +28,18 @@ public class Database {
                                     .build()
                     )
             );
+            client.sql("CREATE TABLE IF NOT EXISTS " +
+                    "chans (channelID BIGINT, userID BIGINT, PRIMARY KEY (channelID, userID))")
+                    .then()
+                    .block();
         } catch (Exception e) {
             System.out.println("Database connection failure! Retrying in " + Math.pow(2, retry) + " seconds.");
-            Thread.sleep(retry * 1000L);
+            e.printStackTrace();
+            try {
+                Thread.sleep((long) (Math.pow(2, retry) * 1000L));
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            }
             getCon(retry + 1);
         }
     }
