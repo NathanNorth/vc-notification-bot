@@ -1,0 +1,13 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    volumes:
+       - ./data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: vcbot
+      POSTGRES_PASSWORD: password
+
+  bot:
+    build: .
+    restart: on-failure

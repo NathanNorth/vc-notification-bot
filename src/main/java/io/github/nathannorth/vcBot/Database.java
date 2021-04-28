@@ -13,10 +13,11 @@ public class Database {
     private static final DatabaseClient client = DatabaseClient.create(
             new PostgresqlConnectionFactory(
                     PostgresqlConnectionConfiguration.builder()
-                            .host("localhost")
-                            .username("postgres")
-                            .password("password")
-                            .database("postgres")
+                            .database(Util.getKeys().get(2))
+                            .username(Util.getKeys().get(2))
+                            .password(Util.getKeys().get(3))
+                            .host(Util.getKeys().get(4))
+                            .port(Integer.parseInt(Util.getKeys().get(5)))
                             .build()
             )
     );

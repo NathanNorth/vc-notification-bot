@@ -1,0 +1,18 @@
+######################################
+#           BOT SETTINGS             #
+######################################
+#token
+[INSERT YOUR TOKEN HERE]
+#status
+1.0-ALPHA
+######################################
+#        POSTGRES SETTINGS           #
+######################################
+#username
+vcbot
+#password
+password
+#hostname
+localhost
+#port
+5432

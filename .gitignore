@@ -8,3 +8,4 @@
 
 #database data
 /postgres/data/
+/docker-self-contained/data/

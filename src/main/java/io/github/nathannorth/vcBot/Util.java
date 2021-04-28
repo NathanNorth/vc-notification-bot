@@ -24,8 +24,15 @@ public class Util {
             for (int i = keys.size() - 1; i >= 0; i--) {
                 if (keys.get(i).indexOf('#') == 0) keys.remove(i);
             }
+            if(keys.get(0).equals("[INSERT YOUR TOKEN HERE]")) throw new NullPointerException("Bot token in keys.txt is not defined.");
+            if(keys.size() < 6) throw new NotEnoughKeysException("Not enough keys defined!");
         }
         return keys;
+    }
+    private static class NotEnoughKeysException extends RuntimeException {
+        private NotEnoughKeysException(String in) {
+            super(in);
+        }
     }
 
     //shortcut method for a follow up to a InteractionCreateEvent
