@@ -10,23 +10,38 @@ import reactor.core.publisher.Mono;
 
 public class Database {
 
-    private static final DatabaseClient client = DatabaseClient.create(
-            new PostgresqlConnectionFactory(
-                    PostgresqlConnectionConfiguration.builder()
-                            .database(Util.getKeys().get(2))
-                            .username(Util.getKeys().get(2))
-                            .password(Util.getKeys().get(3))
-                            .host(Util.getKeys().get(4))
-                            .port(Integer.parseInt(Util.getKeys().get(5)))
-                            .build()
-            )
-    );
+    private static DatabaseClient client;
 
     public static void init() {
+        try {
+            getCon(0);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         client.sql("CREATE TABLE IF NOT EXISTS " +
                 "chans (channelID BIGINT, userID BIGINT, PRIMARY KEY (channelID, userID))")
                 .then()
                 .block();
+    }
+
+    private static void getCon(int retry) throws InterruptedException {
+        try {
+            client = DatabaseClient.create(
+                    new PostgresqlConnectionFactory(
+                            PostgresqlConnectionConfiguration.builder()
+                                    .database(Util.getKeys().get(2))
+                                    .username(Util.getKeys().get(2))
+                                    .password(Util.getKeys().get(3))
+                                    .host(Util.getKeys().get(4))
+                                    .port(Integer.parseInt(Util.getKeys().get(5)))
+                                    .build()
+                    )
+            );
+        } catch (Exception e) {
+            System.out.println("Database connection failure! Retrying in " + Math.pow(2, retry) + " seconds.");
+            Thread.sleep(retry * 1000L);
+            getCon(retry + 1);
+        }
     }
 
     public static Flux<Snowflake> getChans() {
