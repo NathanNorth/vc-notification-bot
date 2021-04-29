@@ -13,15 +13,15 @@ public class UnWatch extends Command {
 
     @Override
     protected ApplicationCommandRequest getRequest() {
-         return ApplicationCommandRequest.builder()
-                 .name("unwatch")
-                 .description("Remove a voice channel from your watchlist")
-                 .addOption(ApplicationCommandOptionData.builder()
-                         .name("channel")
-                         .description("Channel for the bot stop watching")
-                         .type(ApplicationCommandOptionType.CHANNEL.getValue()).required(true)
-                         .build())
-                 .build();
+        return ApplicationCommandRequest.builder()
+                .name("unwatch")
+                .description("Remove a voice channel from your watchlist")
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name("channel")
+                        .description("Channel for the bot stop watching")
+                        .type(ApplicationCommandOptionType.CHANNEL.getValue()).required(true)
+                        .build())
+                .build();
     }
 
     @Override

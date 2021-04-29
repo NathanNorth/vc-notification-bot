@@ -8,6 +8,8 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 public class Database {
 
     private static final DatabaseClient client =
@@ -30,7 +32,7 @@ public class Database {
                 .then()
                 .block();
     }
-    //catch blocks from hell to try doing a simple db action on a 2 ^ (attempt) second retry loop
+    //try an database query and if that fails retry on a 2^(attempt) second delay
     private static void getCon(int retry) {
         try {
             client.sql("CREATE TABLE IF NOT EXISTS " +
@@ -39,11 +41,7 @@ public class Database {
                     .block();
         } catch (Exception e) {
             System.out.println("Database connection failure! Retrying in " + Math.pow(2, retry) + " seconds.");
-            try {
-                Thread.sleep((long) (Math.pow(2, retry) * 1000L));
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
-            }
+            Mono.delay(Duration.ofSeconds((long) Math.pow(2, retry))).block();
             getCon(retry + 1);
         }
     }
