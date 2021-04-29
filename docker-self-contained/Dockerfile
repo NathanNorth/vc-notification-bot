@@ -11,10 +11,7 @@ WORKDIR /code
 RUN chmod +x gradlew
 RUN /code/gradlew -Dorg.gradle.java.home=/usr/lib/jvm/java-1.8-openjdk build && mv build/libs/vc-notification-bot-*.jar /code/bot.jar
 
-#FROM openjdk:8-jdk-slim
 FROM openjdk:8-jdk-alpine
-#EXPOSE 5432
-
 COPY --from=build-env /code/bot.jar /bot/bot.jar
 COPY keys.txt /bot/keys.txt
 WORKDIR /bot
