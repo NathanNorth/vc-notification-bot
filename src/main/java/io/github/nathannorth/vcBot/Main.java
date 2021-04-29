@@ -17,7 +17,7 @@ public class Main {
         //init systems
         Bot.init();
         Commands.init();
-        Database.init();
+        Database.init(); //todo move this up
 
         //define fluxes
         Flux<Event> slashInteraction = Bot.getClient().on(slashAdapter);

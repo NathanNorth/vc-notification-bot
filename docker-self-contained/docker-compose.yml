@@ -1,12 +1,13 @@
 services:
-  db:
+  dockerDB:
     image: postgres
     restart: always
     volumes:
        - ./data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: vcbot
-      POSTGRES_PASSWORD: password
+      - POSTGRES_USER=vcbot
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=vcbot
 
   bot:
     build: .
