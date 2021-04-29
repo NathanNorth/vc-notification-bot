@@ -1,1 +1,0 @@
-docker stop database1
