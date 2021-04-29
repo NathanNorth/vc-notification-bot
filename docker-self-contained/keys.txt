@@ -13,6 +13,6 @@ vcbot
 #password
 password
 #hostname
-localhost
+dockerDB
 #port
 5432
