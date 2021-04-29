@@ -33,7 +33,6 @@ public class Database {
                     .then()
                     .block();
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Database connection failure! Retrying in " + Math.pow(2, retry) + " seconds.");
             try {
                 Thread.sleep((long) (Math.pow(2, retry) * 1000L));
