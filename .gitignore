@@ -3,9 +3,9 @@
 /build/
 /build/classes/java/main/
 
-#key file
+#developement key file
 /keys.txt
 
-#database data
-/postgres/data/
+#database data and development postgres folder
+/postgres/
 /docker-self-contained/data/
