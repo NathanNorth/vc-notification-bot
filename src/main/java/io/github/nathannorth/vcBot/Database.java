@@ -25,7 +25,7 @@ public class Database {
     public static void init() {
         getCon(0);
     }
-    //catch blocks from hell to try a simple db action on a 2 ^ (attempt) second retry loop
+    //catch blocks from hell to try doing a simple db action on a 2 ^ (attempt) second retry loop
     private static void getCon(int retry) {
         try {
             client.sql("CREATE TABLE IF NOT EXISTS " +
@@ -33,6 +33,7 @@ public class Database {
                     .then()
                     .block();
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Database connection failure! Retrying in " + Math.pow(2, retry) + " seconds.");
             try {
                 Thread.sleep((long) (Math.pow(2, retry) * 1000L));
