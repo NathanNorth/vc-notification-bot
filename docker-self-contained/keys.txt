@@ -4,7 +4,7 @@
 #token
 [INSERT YOUR TOKEN HERE]
 #status
-1.0-ALPHA
+1.1-ALPHA
 ######################################
 #        POSTGRES SETTINGS           #
 ######################################

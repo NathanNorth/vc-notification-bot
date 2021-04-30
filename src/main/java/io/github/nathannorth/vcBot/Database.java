@@ -8,6 +8,8 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 public class Database {
 
     private static final DatabaseClient client =
@@ -24,46 +26,48 @@ public class Database {
 
     public static void init() {
         getCon(0);
+        //purge messageIDs on startup
+        client.sql("UPDATE chans SET messageID = :empty")
+                .bind("empty", 0L)
+                .then()
+                .block();
     }
-    //catch blocks from hell to try doing a simple db action on a 2 ^ (attempt) second retry loop
+    //try an database query and if that fails retry on a 2^(attempt) second delay
     private static void getCon(int retry) {
         try {
             client.sql("CREATE TABLE IF NOT EXISTS " +
-                    "chans (channelID BIGINT, userID BIGINT, PRIMARY KEY (channelID, userID))")
+                    "chans (channelID BIGINT, userID BIGINT, messageID BIGINT, PRIMARY KEY (channelID, userID))")
                     .then()
                     .block();
         } catch (Exception e) {
             System.out.println("Database connection failure! Retrying in " + Math.pow(2, retry) + " seconds.");
-            try {
-                Thread.sleep((long) (Math.pow(2, retry) * 1000L));
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
-            }
+            Mono.delay(Duration.ofSeconds((long) Math.pow(2, retry))).block();
             getCon(retry + 1);
         }
     }
 
     public static Flux<Snowflake> getChans() {
-        return client.sql("SELECT channelID FROM chans")
+        return client.sql("SELECT DISTINCT channelID FROM chans")
                 .map((row, data) -> Snowflake.of(row.get("channelID", Long.class)))
                 .all();
     }
 
-    public static Flux<Snowflake> relevantUsersFor(Snowflake channel) {
-        return client.sql("SELECT userID FROM chans WHERE channelID = :chan")
+    public static Flux<User> relevantUsersFor(Snowflake channel) {
+        return client.sql("SELECT * FROM chans WHERE channelID = :chan")
                 .bind("chan", channel.asLong())
-                .map((row, data) -> Snowflake.of(row.get("userID", Long.class)))
+                .map((row, data) -> new User(row.get("userID", Long.class), row.get("messageID", Long.class)))
                 .all()
-                .filterWhen(userFlake -> Bot.getClient().getChannelById(channel).ofType(VoiceChannel.class)
-                        .flatMap(vc -> vc.isMemberConnected(userFlake).map(bool -> !bool))
+                .filterWhen(user -> Bot.getClient().getChannelById(channel).ofType(VoiceChannel.class)
+                        .flatMap(vc -> vc.isMemberConnected(user.userID).map(bool -> !bool))
                 );
     }
 
     //boolean represents whether or not the user was already added for that channel
     public static Mono<Boolean> addUserForChan(Snowflake channel, Snowflake user) {
-        return client.sql("INSERT INTO chans (channelID, userID) VALUES (:chan, :user)")
+        return client.sql("INSERT INTO chans (channelID, userID, messageID) VALUES (:chan, :user, :empty)")
                 .bind("chan", channel.asLong())
                 .bind("user", user.asLong())
+                .bind("empty", 0L)
                 .then() //catch errors for when we try to add an already existent user
                 .then(Mono.just(true)).onErrorResume(error -> Mono.just(false));
     }
@@ -85,5 +89,13 @@ public class Database {
                 .bind("user", user.asLong())
                 .map((row, metadata) -> true)
                 .first();
+    }
+
+    public static Mono<Void> updateMessage(Snowflake channel, Snowflake user, Snowflake newMsgID) {
+        return client.sql("UPDATE chans SET messageID = :msg WHERE channelID = :chan AND userID = :user")
+                .bind("chan", channel.asLong())
+                .bind("user", user.asLong())
+                .bind("msg", newMsgID.asLong())
+                .then();
     }
 }

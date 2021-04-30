@@ -7,5 +7,5 @@
 /keys.txt
 
 #database data and development postgres folder
-/postgres/
 /docker-self-contained/data/
+/postgres/
