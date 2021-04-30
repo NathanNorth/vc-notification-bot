@@ -53,6 +53,7 @@ public class Main {
     private static Mono<Void> alert(User userObj, Snowflake aboutWhom, Snowflake joiningWhere) {
         Mono<Void> returnable;
 
+        //declare a bunch of convenience publishers
         Mono<VoiceChannel> channelMono = Bot.getClient().getChannelById(joiningWhere).ofType(VoiceChannel.class);
         Mono<String> channelName = channelMono.map(chan -> chan.getName());
         Mono<String> guildName = channelMono.flatMap(chan -> chan.getGuild().map(guild -> guild.getName()));
@@ -61,6 +62,7 @@ public class Main {
 
         //first time user has been notified about this channel
         if(userObj.messageID == null) {
+            //merge publishers
             Mono<String> message = Mono.zip(channelName, guildName, userName)
                     .map(tuple -> {
                         String chan = tuple.getT1();
@@ -68,6 +70,7 @@ public class Main {
                         String user = tuple.getT3();
                         return "**[" + user + "]** joined the **[" + chan + "]** channel in the **[" + guild + "]** server";
                     });
+            //get dm channel, send message, update database with said message's id
             returnable = message.flatMap(string ->
                     Bot.getClient().getUserById(userObj.userID)
                             .flatMap(user -> user.getPrivateChannel()
