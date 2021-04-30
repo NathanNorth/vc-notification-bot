@@ -5,16 +5,19 @@ import discord4j.discordjson.json.ApplicationCommandRequest;
 import io.github.nathannorth.vcBot.Util;
 import reactor.core.publisher.Mono;
 
-public class Error extends Command {
-    public final static Error obj = new Error();
+public class ErrorCommand extends Command {
+    public final static ErrorCommand obj = new ErrorCommand();
 
     //cannot be constructed
-    private Error() {
+    private ErrorCommand() {
     }
 
     @Override
     protected ApplicationCommandRequest getRequest() {
-        return null;
+        return ApplicationCommandRequest.builder()
+                .name("placeholder")
+                .description("should never actually be used")
+                .build();
     }
 
     @Override

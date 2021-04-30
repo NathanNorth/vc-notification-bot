@@ -1,10 +1,7 @@
 package io.github.nathannorth.vcBot;
 
 import discord4j.discordjson.json.ApplicationCommandRequest;
-import io.github.nathannorth.vcBot.commands.Command;
-import io.github.nathannorth.vcBot.commands.Error;
-import io.github.nathannorth.vcBot.commands.UnWatch;
-import io.github.nathannorth.vcBot.commands.Watch;
+import io.github.nathannorth.vcBot.commands.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +36,6 @@ public class Commands {
     }
 
     public static Command getCommand(String name) {
-        return responses.getOrDefault(name, Error.obj);
+        return responses.getOrDefault(name, ErrorCommand.obj);
     }
 }
