@@ -56,8 +56,7 @@ public class Main {
         Mono<String> userName = Bot.getClient().getUserById(aboutWhom)
                         .map(person -> person.getUsername() + "#" + person.getDiscriminator());
 
-        //first time user has been notified about this channel
-        if(userObj.messageID == null) {
+        if(userObj.messageID == null) { //first time user has been notified about this channel
             //merge publishers
             Mono<String> message = Mono.zip(channelName, guildName, userName)
                     .map(tuple -> {
