@@ -6,7 +6,7 @@ Simply use `/watch <channel>` to add a channel to your watchlist, and `/unwatch 
 vc-notification-bot is built reactively using [Discord4J](https://github.com/Discord4J/Discord4J) and a [R2DBC](https://r2dbc.io/) managed PostgreSQL database backend.
 
 # behavior
-The bot will send you one message when someone first joins a vc that you are watching.
+The bot will send you one message when someone first joins a voice channel that you are watching.
 
 ![1userExample](./example-assets/singleJoinExample.png)
 
@@ -14,9 +14,7 @@ If multiple people join that voice channel, then the bot will edit its original 
 
 ![3userExample](./example-assets/multipleJoinsExample.png)
 
-The bot will continue to edit that same message everytime somebody joins until everyone has left the voice call.
-
-The bot will never notify you about people joining a call you are already in.
+The bot will continue to edit that same message everytime somebody joins until everyone has left the voice call. The bot will never notify you about people joining a call you are already in.
 
 You can `/watch <channel>` on as many voice channels as you like.
 
