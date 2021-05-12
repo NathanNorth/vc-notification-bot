@@ -24,7 +24,7 @@ public class Util {
             for (int i = keys.size() - 1; i >= 0; i--) {
                 if (keys.get(i).indexOf('#') == 0) keys.remove(i);
             }
-            if(keys.get(0).equals("[INSERT YOUR TOKEN HERE]")) throw new NullPointerException("Bot token in keys.txt is not defined.");
+            if(keys.get(0).equals("[INSERT YOUR TOKEN HERE]")) throw new NotEnoughKeysException("Bot token in keys.txt is not defined.");
             if(keys.size() < 6) throw new NotEnoughKeysException("Not enough keys defined!");
         }
         return keys;
@@ -36,8 +36,8 @@ public class Util {
     }
 
     //shortcut method for a follow up to a InteractionCreateEvent
-    public static Mono<MessageData> followUp(InteractionCreateEvent event, String messsage) {
-        return event.getInteractionResponse().createFollowupMessage(messsage);
+    public static Mono<MessageData> followUp(InteractionCreateEvent event, String message) {
+        return event.getInteractionResponse().createFollowupMessage(message);
     }
 
     //shortcut method to get a channel from a slash command that requires a channel arg

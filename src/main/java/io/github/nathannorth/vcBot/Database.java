@@ -32,7 +32,7 @@ public class Database {
                 .then()
                 .block();
     }
-    //try an database query and if that fails retry on a 2^(attempt) second delay
+    //try a database query and if that fails retry on a 2^(attempt) second delay
     private static void getCon(int retry) {
         try {
             client.sql("CREATE TABLE IF NOT EXISTS " +

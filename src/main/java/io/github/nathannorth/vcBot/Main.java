@@ -3,10 +3,15 @@ package io.github.nathannorth.vcBot;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.rest.http.client.ClientException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
