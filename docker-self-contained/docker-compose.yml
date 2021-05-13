@@ -12,3 +12,4 @@ services:
 
   bot:
     build: .
+    restart: always
