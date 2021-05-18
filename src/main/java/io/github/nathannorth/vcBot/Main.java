@@ -3,15 +3,10 @@ package io.github.nathannorth.vcBot;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
-import discord4j.core.object.entity.Member;
-import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.rest.http.client.ClientException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -54,12 +49,12 @@ public class Main {
     private static Mono<Void> alert(User userObj, Snowflake aboutWhom, Snowflake joiningWhere) {
         Mono<Void> returnable;
 
-        //declare a bunch of convenience publishers
+        //declare a bunch of publishers
         Mono<VoiceChannel> channelMono = Bot.getClient().getChannelById(joiningWhere).ofType(VoiceChannel.class);
         Mono<String> channelName = channelMono.map(chan -> chan.getName());
         Mono<String> guildName = channelMono.flatMap(chan -> chan.getGuild().map(guild -> guild.getName()));
         Mono<String> userName = Bot.getClient().getUserById(aboutWhom)
-                        .map(person -> person.getUsername() + "#" + person.getDiscriminator());
+                .map(person -> person.getUsername() + "#" + person.getDiscriminator());
 
         if(userObj.messageID == null) { //first time user has been notified about this channel
             //merge publishers
@@ -87,15 +82,19 @@ public class Main {
                         long num = tuple.getT3();
                         return "**[" + num + " users]** have joined the **[" + chan + "]** channel in the **[" + guild + "]** server";
                     });
-            returnable = message.flatMap(string -> Bot.getClient().getUserById(aboutWhom)
-                    .flatMap(user -> user.getPrivateChannel()
-                            .flatMap(privateChannel -> Bot.getClient().getMessageById(privateChannel.getId(), userObj.messageID)
-                                    .flatMap(sentmsg -> sentmsg.edit(edit -> edit.setContent(string))))
-                    )).then();
+            returnable = message.flatMap(string ->
+                    Bot.getClient().getUserById(userObj.userID)
+                            .flatMap(user -> user.getPrivateChannel()
+                                    .flatMap(privateChannel -> Bot.getClient().getMessageById(privateChannel.getId(), userObj.messageID)
+                                            .flatMap(sentmsg -> sentmsg.edit(edit -> edit.setContent(string))))
+                            )).then();
         }
 
         return returnable.onErrorResume(e -> {
-            if(e instanceof ClientException) return Mono.empty(); //throw away permission errors
+            if(e instanceof ClientException) {
+                e.printStackTrace();
+                return Mono.empty(); //throw away permission errors
+            }
             else return Mono.error(e); //still crash the program if something else goes wrong
         });
     }
