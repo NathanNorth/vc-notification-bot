@@ -1,10 +1,12 @@
 package io.github.nathannorth.vcBot;
 
 import discord4j.common.util.Snowflake;
+import discord4j.core.event.ReactiveEventAdapter;
 import discord4j.core.event.domain.InteractionCreateEvent;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.object.entity.channel.VoiceChannel;
 import discord4j.rest.http.client.ClientException;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -15,37 +17,49 @@ public class Main {
         Bot.init();
         Commands.init();
 
-        //define fluxes
-        //deal with slash commands
-        Flux<Object> slashInteraction = Bot.getClient().on(InteractionCreateEvent.class)
-                .flatMap(event -> event.acknowledgeEphemeral()
-                        .then(Commands.getCommand(event.getCommandName()).execute(event)));
-        //handle join events
-        Flux<Object> joinEventsListener = Bot.getClient().on(VoiceStateUpdateEvent.class)
-                .filter(event -> event.isJoinEvent() || event.isMoveEvent())
-                .map(event -> event.getCurrent())
-                .filterWhen(current -> Database.getChans().any(snowflake -> snowflake.equals(current.getChannelId().get())))
-                .flatMap(current -> Database.relevantUsersFor(current.getChannelId().get())
-                        .flatMap(userSnowflake -> alert(userSnowflake, current.getUserId(), current.getChannelId().get()))
-                );
-        //handle leave events
-        Flux<Object> leaveEventsListener = Bot.getClient().on(VoiceStateUpdateEvent.class)
-                .filter(event -> event.isLeaveEvent() || event.isMoveEvent())
-                .map(event -> event.getOld().get())
-                .filterWhen(event -> event.getChannel()
-                        .flatMap(chan -> chan.getVoiceStates().count().map(count -> count == 0))) //we only care about leave events when the vc hits 0 people
-                .filterWhen(current -> Database.getChans().any(snowflake -> snowflake.equals(current.getChannelId().get())))
-                .flatMap(e -> Database.relevantUsersFor(e.getChannelId().get())
-                        .flatMap(user -> Database.updateMessage(e.getChannelId().get(), user.userID, Snowflake.of(0L)))
-                );
-
-        //subscribe to fluxes
-        Flux.merge(slashInteraction, joinEventsListener, leaveEventsListener)
+        //subscribe to REA's
+        Flux.merge(Bot.getClient().on(slashInteraction), Bot.getClient().on(joinEvents), Bot.getClient().on(leaveEvents))
                 .subscribe();
 
         //block to keep program running
         Bot.getClient().onDisconnect().block();
     }
+    //handle slash commands
+    public static final ReactiveEventAdapter slashInteraction = new ReactiveEventAdapter() {
+        @Override
+        public Publisher<?> onInteractionCreate(InteractionCreateEvent source) {
+            return source.acknowledgeEphemeral()
+                    .then(Commands.getCommand(source.getCommandName()).execute(source));
+        }
+    };
+    //handle join events
+    public static final ReactiveEventAdapter joinEvents = new ReactiveEventAdapter() {
+        @Override
+        public Publisher<?> onVoiceStateUpdate(VoiceStateUpdateEvent source) {
+            return Mono.just(source)
+                    .filter(event -> event.isJoinEvent() || event.isMoveEvent())
+                    .map(event -> event.getCurrent())
+                    .filterWhen(current -> Database.getChans().any(snowflake -> snowflake.equals(current.getChannelId().get())))
+                    .flatMapMany(current -> Database.relevantUsersFor(current.getChannelId().get())
+                            .flatMap(userSnowflake -> alert(userSnowflake, current.getUserId(), current.getChannelId().get()))
+                    );
+        }
+    };
+    //handle leave events
+    public static final ReactiveEventAdapter leaveEvents = new ReactiveEventAdapter() {
+        @Override
+        public Publisher<?> onVoiceStateUpdate(VoiceStateUpdateEvent source) {
+            return Mono.just(source)
+                    .filter(event -> event.isLeaveEvent() || event.isMoveEvent())
+                    .map(event -> event.getOld().get())
+                    .filterWhen(event -> event.getChannel()
+                            .flatMap(chan -> chan.getVoiceStates().count().map(count -> count == 0))) //we only care about leave events when the vc hits 0 people
+                    .filterWhen(current -> Database.getChans().any(snowflake -> snowflake.equals(current.getChannelId().get())))
+                    .flatMapMany(e -> Database.relevantUsersFor(e.getChannelId().get())
+                            .flatMap(user -> Database.updateMessage(e.getChannelId().get(), user.userID, Snowflake.of(0L)))
+                    );
+        }
+    };
     private static Mono<Void> alert(User userObj, Snowflake aboutWhom, Snowflake joiningWhere) {
         Mono<Void> returnable;
 
@@ -92,10 +106,11 @@ public class Main {
 
         return returnable.onErrorResume(e -> {
             if(e instanceof ClientException) {
+                System.out.println("Permissions Error caught...printing trace:");
                 e.printStackTrace();
                 return Mono.empty(); //throw away permission errors
             }
-            else return Mono.error(e); //still crash the program if something else goes wrong
+            else return Mono.error(e); //send error upstream to the program if something else goes wrong
         });
     }
 }
